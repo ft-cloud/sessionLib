@@ -15,7 +15,7 @@ var session = {
 
         const session = uuid.v4();
 
-        var sql = `INSERT INTO session (uuid,user,timeout) VALUES (?, ?, DATE_ADD(now(),interval ${interval} minute))`;
+        var sql = `INSERT INTO session (uuid,user,timeout) VALUES (?, ?, DATEADD(MINUTE,${interval},now()))`;
         global.connection.query(sql,[session,user], function (err, result) {
             if (err) throw err;
         });
