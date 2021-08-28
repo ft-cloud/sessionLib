@@ -19,7 +19,7 @@ var session = {
         global.connection.query(sql,[session,user], function (err, result) {
             if (err) throw err;
         });
-        console.log(interval)
+        console.log(sql)
         return session;
 
     },
