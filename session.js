@@ -3,20 +3,20 @@ const generateAPIKey = function generateAPIToken(user, usedBy, callback) {
 
     const session = uuid.v4();
 
-    var sql = `INSERT INTO session (uuid,user,timeout,token,usedBy) VALUES ('${session}', '${user}', DATE_ADD(now(),interval 10 minute),1,'${usedBy}')`;
-    global.connection.query(sql, function (err, result) {
+    var sql = `INSERT INTO session (uuid,user,timeout,token,usedBy) VALUES ('?', '?', DATE_ADD(now(),interval 10 minute),1,'?')`;
+    global.connection.query(sql,[session,user,usedBy], function (err, result) {
         if (err) throw err;
         callback(session);
     });
 
 };
 var session = {
-    startsession: function (user) {
+    startsession: function (user,interval = 10) {
 
         const session = uuid.v4();
 
-        var sql = `INSERT INTO session (uuid,user,timeout) VALUES ('${session}', '${user}', DATE_ADD(now(),interval 10 minute))`;
-        global.connection.query(sql, function (err, result) {
+        var sql = `INSERT INTO session (uuid,user,timeout) VALUES ('?', '?', DATE_ADD(now(),interval ? minute))`;
+        global.connection.query(sql,[session,user,interval], function (err, result) {
             if (err) throw err;
         });
 
@@ -26,8 +26,8 @@ var session = {
 
     reactivateSession: function (session) {
 
-        var sql = `UPDATE session SET timeout = DATE_ADD(now(),interval 10 minute) WHERE uuid = '${session}'`;
-        global.connection.query(sql, function (err, result) {
+        var sql = `UPDATE session SET timeout = DATE_ADD(now(),interval 10 minute) WHERE uuid = '?'`;
+        global.connection.query(sql,[session], function (err, result) {
             if (err) throw err;
         });
     },
@@ -36,8 +36,8 @@ var session = {
     getUserUUID: function (session, callback) {
 
 
-        var sql = `SELECT user FROM session WHERE uuid='${session}';`;
-        global.connection.query(sql, function (err, result) {
+        var sql = `SELECT user FROM session WHERE uuid='?';`;
+        global.connection.query(sql,[session], function (err, result) {
 
             if (result && result[0]) {
                 callback(result[0].user);
@@ -58,9 +58,9 @@ var session = {
     deleteSession: function (session) {
 
         return new Promise((resolve) => {
-            var sql = `delete from session where uuid='${session}'`;
+            var sql = `delete from session where uuid='?'`;
 
-            global.connection.query(sql, function (err, result) {
+            global.connection.query(sql,[session], function (err, result) {
                 if (err) throw err;
 
                 resolve(`{\"success\":\"loged out\"}`);
@@ -77,9 +77,9 @@ var session = {
 
     validateSession: function (session, callback) {
 
-        var sql = `SELECT * FROM session WHERE uuid = '${session.toString()}';`;
+        var sql = `SELECT * FROM session WHERE uuid = '?';`;
 
-        global.connection.query(sql, function (err, result) {
+        global.connection.query(sql,[session.toString()], function (err, result) {
             if (result && result[0]) {
                 callback(true);
 
@@ -102,11 +102,3 @@ var session = {
 module.exports = session;
 
 
-function deleteSessions() {
-    var sql = `delete from session where (timeout < DATE_SUB(now(),interval 10 minute) and (token = 0))`;
-    global.connection.query(sql, function (err, result) {
-        if (err) throw err;
-    });
-}
-
-setInterval(deleteSessions, 1000 * 60 * 2);
