@@ -11,13 +11,11 @@ const generateAPIKey = function generateAPIToken(user, usedBy, callback) {
 
 };
 var session = {
-    startsession: function (user,interval = 10) {
+    startsession: function (user,interval = 30) {
 
         const session = uuid.v4();
-        var newDateObj = new Date(Date.now() + interval*60000);
-        console.log(newDateObj.toISOString().slice(0, 19).replace('T', ' '))
 
-        var sql = `INSERT INTO session (uuid,user,timeout) VALUES (?, ?, '${newDateObj.toISOString().slice(0, 19).replace('T', ' ')}')`;
+        var sql = `INSERT INTO session (uuid,user,timeout) VALUES (?, ?, DATE_ADD(now(),INTERVAL ${interval} MINUTE))`;
         global.connection.query(sql,[session,user], function (err, result) {
             if (err) throw err;
         });
@@ -27,11 +25,11 @@ var session = {
     },
 
     reactivateSession: function (session) {
-
-        var sql = `UPDATE session SET timeout = DATE_ADD(now(),interval 10 minute) WHERE uuid = ?`;
-        global.connection.query(sql,[session], function (err, result) {
-            if (err) throw err;
-        });
+            //TODO fix time bug
+       // var sql = `UPDATE session SET timeout = DATE_ADD(now(),interval 10 minute) WHERE uuid = ?`;
+       // global.connection.query(sql,[session], function (err, result) {
+        //    if (err) throw err;
+        //});
     },
 
 
