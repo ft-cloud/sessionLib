@@ -3,7 +3,7 @@ const generateAPIKey = function generateAPIToken(user, usedBy, callback) {
 
     const session = uuid.v4();
 
-    var sql = `INSERT INTO session (uuid,user,timeout,token,usedBy) VALUES ('?', '?', DATE_ADD(now(),interval 10 minute),1,'?')`;
+    var sql = `INSERT INTO session (uuid,user,timeout,token,usedBy) VALUES (?, ?, DATE_ADD(now(),interval 10 minute),1,?)`;
     global.connection.query(sql,[session,user,usedBy], function (err, result) {
         if (err) throw err;
         callback(session);
@@ -15,7 +15,7 @@ var session = {
 
         const session = uuid.v4();
 
-        var sql = `INSERT INTO session (uuid,user,timeout) VALUES ('?', '?', DATE_ADD(now(),interval ? minute))`;
+        var sql = `INSERT INTO session (uuid,user,timeout) VALUES (?, ?, DATE_ADD(now(),interval ? minute))`;
         global.connection.query(sql,[session,user,interval], function (err, result) {
             if (err) throw err;
         });
@@ -26,7 +26,7 @@ var session = {
 
     reactivateSession: function (session) {
 
-        var sql = `UPDATE session SET timeout = DATE_ADD(now(),interval 10 minute) WHERE uuid = '?'`;
+        var sql = `UPDATE session SET timeout = DATE_ADD(now(),interval 10 minute) WHERE uuid = ?`;
         global.connection.query(sql,[session], function (err, result) {
             if (err) throw err;
         });
@@ -36,7 +36,7 @@ var session = {
     getUserUUID: function (session, callback) {
 
 
-        var sql = `SELECT user FROM session WHERE uuid='?';`;
+        var sql = `SELECT user FROM session WHERE uuid=?;`;
         global.connection.query(sql,[session], function (err, result) {
 
             if (result && result[0]) {
@@ -58,7 +58,7 @@ var session = {
     deleteSession: function (session) {
 
         return new Promise((resolve) => {
-            var sql = `delete from session where uuid='?'`;
+            var sql = `delete from session where uuid=?`;
 
             global.connection.query(sql,[session], function (err, result) {
                 if (err) throw err;
@@ -77,7 +77,7 @@ var session = {
 
     validateSession: function (session, callback) {
 
-        var sql = `SELECT * FROM session WHERE uuid = '?';`;
+        var sql = `SELECT * FROM session WHERE uuid = ?;`;
 
         global.connection.query(sql,[session.toString()], function (err, result) {
             if (result && result[0]) {
