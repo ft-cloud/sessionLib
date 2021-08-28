@@ -17,7 +17,7 @@ var session = {
         var newDateObj = new Date(Date.now() + interval*60000);
         console.log(newDateObj.toISOString().slice(0, 19).replace('T', ' '))
 
-        var sql = `INSERT INTO session (uuid,user,timeout) VALUES (?, ?, ${newDateObj.toISOString().slice(0, 19).replace('T', ' ')})`;
+        var sql = `INSERT INTO session (uuid,user,timeout) VALUES (?, ?, '${newDateObj.toISOString().slice(0, 19).replace('T', ' ')}')`;
         global.connection.query(sql,[session,user], function (err, result) {
             if (err) throw err;
         });
