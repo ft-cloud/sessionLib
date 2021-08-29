@@ -25,11 +25,10 @@ var session = {
     },
 
     reactivateSession: function (session) {
-            //TODO fix time bug
-       // var sql = `UPDATE session SET timeout = DATE_ADD(now(),interval 10 minute) WHERE uuid = ?`;
-       // global.connection.query(sql,[session], function (err, result) {
-        //    if (err) throw err;
-        //});
+        var sql = `UPDATE session SET timeout = DATE_ADD(now(),interval 30 minute) WHERE uuid = ? AND timeout < DATE_ADD(now(),interval 30 minute)`;
+        global.connection.query(sql,[session], function (err, result) {
+            if (err) throw err;
+        });
     },
 
 
