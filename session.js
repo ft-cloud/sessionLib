@@ -1,72 +1,67 @@
 var uuid = require('uuid');
-const generateAPIKey = function generateAPIToken(user, usedBy, callback) {
+const generateAPIKey = function generateAPIToken(userUUID, usedBy, callback) {
 
-    const session = uuid.v4();
+    const sessionUUID = uuid.v4();
+    const session = global.database.collection("session");
+    session.insertOne({
+        uuid: sessionUUID,
+        user: userUUID,
+        timeout: Date.now()+1000*60*10,
+        isToken: true,
+        usedBy: usedBy
 
-    var sql = `INSERT INTO session (uuid,user,timeout,token,usedBy) VALUES (?, ?, DATE_ADD(now(),interval 10 minute),1,?)`;
-    global.connection.query(sql,[session,user,usedBy], function (err, result) {
-        if (err) throw err;
+    }).then(()=> {
         callback(session);
-    });
+
+    })
+
 
 };
 var session = {
     startsession: function (user,interval = 30) {
 
-        const session = uuid.v4();
+        const sessionUUID = uuid.v4();
+        const session = global.database.collection("session");
 
-        var sql = `INSERT INTO session (uuid,user,timeout) VALUES (?, ?, DATE_ADD(now(),INTERVAL ${interval} MINUTE))`;
-        global.connection.query(sql,[session,user], function (err, result) {
-            if (err) throw err;
-        });
-        console.log(sql)
+        session.insertOne({
+            uuid: sessionUUID,
+            user:user,
+            timeout: Date.now()+interval*60*1000
+        })
+
         return session;
 
     },
 
-    reactivateSession: function (session) {
-        var sql = `UPDATE session SET timeout = DATE_ADD(now(),interval 30 minute) WHERE uuid = ? AND timeout < DATE_ADD(now(),interval 30 minute)`;
-        global.connection.query(sql,[session], function (err, result) {
-            if (err) throw err;
-        });
+    reactivateSession: function (sessionUUID) {
+        const session = global.database.collection("session");
+        session.updateOne({uuid:sessionUUID,$max: {timeout: Date.now()+1000*60*10}},{$set: {timeout: Date.now()+1000*60*30}})
+
     },
 
 
-    getUserUUID: function (session, callback) {
+    getUserUUID: function (sessionUUID, callback) {
 
-
-        var sql = `SELECT user FROM session WHERE uuid=?;`;
-        global.connection.query(sql,[session], function (err, result) {
-
-            if (result && result[0]) {
-                callback(result[0].user);
-
-            } else {
-
+        const session = global.database.collection("session");
+        session.findOne({uuid:sessionUUID}).then(result=>{
+            if(result!==null) {
+                callback(result.user)
+            }else{
                 callback(undefined);
-
             }
-
-
-        });
+        })
 
 
     },
 
 
-    deleteSession: function (session) {
+    deleteSession: function (sessionUUID) {
 
         return new Promise((resolve) => {
-            var sql = `delete from session where uuid=?`;
-
-            global.connection.query(sql,[session], function (err, result) {
-                if (err) throw err;
-
+            const session = global.database.collection("session");
+            session.deleteOne({uuid: sessionUUID}).then(()=>{
                 resolve(`{\"success\":\"loged out\"}`);
-
-                //TODO return error when no session is available
-
-            });
+            })
         })
 
 
@@ -74,23 +69,12 @@ var session = {
     },
 
 
-    validateSession: function (session, callback) {
+    validateSession: function (sessionUUID, callback) {
 
-        var sql = `SELECT * FROM session WHERE uuid = ?;`;
-
-        global.connection.query(sql,[session.toString()], function (err, result) {
-            if (result && result[0]) {
-                callback(true);
-
-            } else {
-
-                callback(false);
-
-            }
-
-
-        });
-
+        const session = global.database.collection("session");
+        session.findOne({uuid:sessionUUID}).then(res=>{
+            callback(res!==null);
+        })
 
     },
     generateAPIKey: generateAPIKey
