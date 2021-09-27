@@ -29,7 +29,7 @@ var session = {
             timeout: Date.now()+interval*60*1000
         })
 
-        return session;
+        return sessionUUID;
 
     },
 
