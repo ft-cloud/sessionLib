@@ -35,7 +35,7 @@ var session = {
 
     reactivateSession: function (sessionUUID) {
         const session = global.database.collection("session");
-        session.updateOne({$match: {uuid:sessionUUID,$max: {timeout: Date.now()+1000*60*10}}},{$set: {timeout: Date.now()+1000*60*30}})
+        session.updateOne({$getField: {uuid:sessionUUID,$max: {timeout: Date.now()+1000*60*10}}},{$set: {timeout: Date.now()+1000*60*30}})
 
     },
 
