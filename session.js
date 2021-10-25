@@ -77,6 +77,42 @@ var session = {
         })
 
     },
+
+    transformSecurelySessionToUserUUID: function(res, req) {
+      return new Promise((resolve => {
+
+          if (req.query.session!=null||req.body.session!=null||req.body.apiKey!=null||req.query.apiKey!=null) {
+              session.validateSession(req.query.session.toString(), (isValid) => {
+                  if (isValid) {
+                      session.reactivateSession(req.query.session);
+                      session.getUserUUID(req.query.session.toString(), (uuid) => {
+                          if (uuid) {
+                            resolve(uuid);
+
+
+                          } else {
+                              res.status(400).json({error:"No valid account!",errorcode:"006"})
+                              resolve(undefined);
+
+                          }
+
+                      });
+
+                  } else {
+                      res.status(401).json({error:"No valid session!",errorcode:"006"})
+                      resolve(undefined);
+
+                  }
+              });
+          } else {
+              res.status(400).json({error:"No valid inputs!",errorcode:"002"})
+              resolve(undefined);
+
+          }
+
+      }))
+    },
+
     generateAPIKey: generateAPIKey
 
 
