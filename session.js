@@ -82,10 +82,20 @@ var session = {
       return new Promise((resolve => {
 
           if (req.query.session!=null||req.body.session!=null||req.body.apiKey!=null||req.query.apiKey!=null) {
-              session.validateSession(req.query.session.toString(), (isValid) => {
+              let apiKey;
+              if(req.query.session!=null) {
+                  apiKey = req.query.session
+              }else if(req.body.session!=null){
+                  apiKey = req.body.session
+              }else if(req.body.apiKey!=null){
+                  apiKey = req.body.apiKey
+              }else if(req.query.apiKey!=null){
+                  apiKey = req.query.apiKey
+              }
+              session.validateSession(apiKey.toString(), (isValid) => {
                   if (isValid) {
-                      session.reactivateSession(req.query.session);
-                      session.getUserUUID(req.query.session.toString(), (uuid) => {
+                      session.reactivateSession(apiKey);
+                      session.getUserUUID(apiKey.toString(), (uuid) => {
                           if (uuid) {
                             resolve(uuid);
 
