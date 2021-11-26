@@ -1,6 +1,6 @@
 {
   "name": "sessionlib",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Backend Session Lib",
   "main": "index.js",
   "repository": "https://github.com/ft-cloud/sessionLib",
@@ -8,5 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "jsonwebtoken": "^8.5.1"
+  }
 }

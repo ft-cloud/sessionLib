@@ -81,7 +81,7 @@ var session = {
     transformSecurelySessionToUserUUID: function(res, req) {
       return new Promise((resolve => {
 
-          if (req.query.session!=null||req.body.session!=null||req.body.apiKey!=null||req.query.apiKey!=null) {
+          if (req.query.session!=null||req.body.session!=null||req.body.apiKey!=null||req.query.apiKey!=null||req.cookies.session!=null||req.cookies.apiKey!=null) {
               let apiKey;
               if(req.query.session!=null) {
                   apiKey = req.query.session
@@ -91,6 +91,10 @@ var session = {
                   apiKey = req.body.apiKey
               }else if(req.query.apiKey!=null){
                   apiKey = req.query.apiKey
+              }else if(req.cookies.session!=null) {
+                  apiKey = req.cookies.session
+              }else if(req.cookies.apiKey!=null) {
+                  apiKey = req.cookies.apiKey
               }
               session.validateSession(apiKey.toString(), (isValid) => {
                   if (isValid) {
