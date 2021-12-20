@@ -18,7 +18,7 @@ const generateAPIKey = function generateAPIToken(userUUID, usedBy, callback) {
 
 
 };
-var session = {
+export const session = {
     startsession: function (user,interval = 30) {
 
         const sessionUUID = uuidV4();
@@ -133,6 +133,6 @@ var session = {
 
 };
 
-module.exports = session;
+
 
 
