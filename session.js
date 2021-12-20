@@ -1,7 +1,8 @@
-var uuid = require('uuid');
+import {v4 as uuidV4} from "uuid";
+
 const generateAPIKey = function generateAPIToken(userUUID, usedBy, callback) {
 
-    const sessionUUID = uuid.v4();
+    const sessionUUID = uuidV4();
     const session = global.database.collection("session");
     session.insertOne({
         uuid: sessionUUID,
@@ -20,7 +21,7 @@ const generateAPIKey = function generateAPIToken(userUUID, usedBy, callback) {
 var session = {
     startsession: function (user,interval = 30) {
 
-        const sessionUUID = uuid.v4();
+        const sessionUUID = uuidV4();
         const session = global.database.collection("session");
 
         session.insertOne({
