@@ -21,16 +21,33 @@ const generateAPIKey = function generateAPIToken(userUUID, usedBy, callback) {
 export const session = {
     startsession: function (user,interval = 30) {
 
-        const sessionUUID = uuidV4();
-        const session = global.database.collection("session");
+      return new Promise((resolve,reject) => {
 
-        session.insertOne({
-            uuid: sessionUUID,
-            user:user,
-            timeout: Date.now()+interval*60*1000
-        })
+          const sessionUUID = uuidV4();
+          const session = global.database.collection("session");
 
-        return sessionUUID;
+          const account = global.database.collection("account")
+
+          account.findOne({uuid: user}).then((userEntry)=> {
+              if (userEntry) {
+                  if(userEntry.verified) {
+                      session.insertOne({
+                          uuid: sessionUUID,
+                          user:user,
+                          timeout: Date.now()+interval*60*1000
+                      })
+
+                      resolve({success: true,session:sessionUUID});
+                  }else{
+                      resolve({success: false,error:"016"});
+
+                  }
+              }
+          })
+
+
+      })
+
 
     },
 
