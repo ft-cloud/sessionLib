@@ -12,7 +12,7 @@ const generateAPIKey = function generateAPIToken(userUUID, usedBy, callback) {
         usedBy: usedBy
 
     }).then(()=> {
-        callback(session);
+        callback(sessionUUID);
 
     })
 
