@@ -103,7 +103,7 @@ export const session = {
             const account = global.database.collection("account");
             account.findOne({uuid: accountUUID}).then((account)=>{
 
-                if(account!=null&&account===true) {
+                if(account!=null&&account.developer!=null&&account.developer===true) {
                     resolve(true);
                 }else{
                     resolve(false);
