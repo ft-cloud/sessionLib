@@ -96,6 +96,24 @@ export const session = {
 
     },
 
+
+    isUserDeveloper: function(accountUUID) {
+        return new Promise(((resolve, reject) => {
+
+            const account = global.database.collection("account");
+            account.findOne({uuid: accountUUID}).then((account)=>{
+
+                if(account!=null&&account===true) {
+                    resolve(true);
+                }else{
+                    resolve(false);
+                }
+
+            })
+
+        }));
+    },
+
     transformSecurelySessionToUserUUID: function(res, req) {
       return new Promise((resolve => {
 
